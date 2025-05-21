@@ -12,7 +12,7 @@ echo "3 - CentOS"
 echo "4 - Arch Linux"
 echo ""
 
-read -p "Digite sua opção (1, 2 ou 3): " opcao
+read -p "Digite sua opção (1, 2, 3 ou 4): " opcao
 
 case $opcao in
     1)
@@ -281,7 +281,10 @@ www.grau.local 192.168.0.1
 ftp.grau.local 192.168.0.1
 EOF
 
-      4)
+        echo "Configuração concluída com sucesso!"
+        ;;
+
+    4)
         echo "Você escolheu configurar DNS no Arch Linux."
 
         SENHA="123"
@@ -371,7 +374,7 @@ EOF
 
         echo "Configuração concluída com sucesso no Arch Linux!"
         ;;
-        
+
     *)
         echo "Opção inválida. Saindo..."
         exit 1
