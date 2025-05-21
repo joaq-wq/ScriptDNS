@@ -16,7 +16,6 @@ case $opcao in
     1)
         echo "Você escolheu configurar DNS no Ubuntu."
         
-        # Senha (somente para fins didáticos!)
         SENHA="123"
 
         echo "Detectando interface de rede..."
@@ -50,7 +49,7 @@ zone "192.in-addr.arpa" {
 };
 EOF
 
-        echo "Editando arquivo db.grau.local..."
+        echo "Criando arquivo db.grau.local..."
         echo $SENHA | sudo -S tee /etc/bind/db.grau.local > /dev/null <<EOF
 \$TTL    604800
 @       IN      SOA     grau.local. root.grau.local. (
@@ -66,7 +65,7 @@ www     IN      A       192.168.0.1
 ftp     IN      A       192.168.0.1
 EOF
 
-        echo "Editando arquivo db.192..."
+        echo "Criando arquivo db.192..."
         echo $SENHA | sudo -S tee /etc/bind/db.192 > /dev/null <<EOF
 \$TTL    604800
 @       IN      SOA     grau.local. root.grau.local. (
@@ -96,7 +95,6 @@ EOF
     2)
         echo "Você escolheu configurar DNS no openSUSE."
         
-        # Senha (somente para fins didáticos!)
         SENHA="123"
 
         echo "Detectando interface de rede..."
@@ -115,25 +113,32 @@ EOF
         echo $SENHA | sudo -S ip addr add 192.168.0.1/24 dev $INTERFACE
         echo $SENHA | sudo -S ip link set $INTERFACE up
 
-        echo "Criando backup do arquivo named.conf..."
+        echo "Criando backup do named.conf..."
         echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
 
-        echo "Criando arquivo zonas.txt em $HOME/Documentos..."
-        tee $HOME/Documentos/zonas.txt > /dev/null <<EOF
-include "/etc/named.conf.include";
+        echo "Configurando named.conf com options e zonas..."
+        echo $SENHA | sudo -S tee /etc/named.conf > /dev/null <<EOF
+options {
+    directory "/var/lib/named";
+    forwarders { };
+    allow-query { any; };
+    recursion yes;
+    listen-on { any; };
+    allow-transfer { none; };
+};
 
 zone "grau.local" IN {
     type master;
-    file "/var/lib/named/grau.local.conf";
+    file "grau.local.conf";
 };
 
 zone "192.in-addr.arpa" IN {
     type master;
-    file "/var/lib/named/db.192";
+    file "db.192";
 };
-EOF
 
-        echo "Obs: O arquivo /etc/named.conf original permanece inalterado e o conteúdo das zonas foi salvo em $HOME/Documentos/zonas.txt"
+include "/etc/named.d/forwarders.conf";
+EOF
 
         echo "Criando arquivo grau.local.conf..."
         echo $SENHA | sudo -S tee /var/lib/named/grau.local.conf > /dev/null <<EOF
