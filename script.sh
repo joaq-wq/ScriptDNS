@@ -93,7 +93,7 @@ EOF
 
         echo "Configuração concluída com sucesso!"
         ;;
-   2)
+ 2)
     echo "Você escolheu configurar DNS no openSUSE."
     
     # Senha (somente para fins didáticos!)
@@ -178,9 +178,5 @@ EOF
 nameserver 192.168.0.1
 EOF
 
-    echo "Configuração concluída com sucesso! Não esqueça de copiar as informações do arquivo zone.txt de Documents para seu arquivo named.conf"
+    echo "Configuração concluída com sucesso!"
     ;;
-
-        exit 1
-        ;;
-esac
