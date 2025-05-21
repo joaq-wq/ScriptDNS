@@ -93,33 +93,33 @@ EOF
 
         echo "Configuração concluída com sucesso!"
         ;;
- 2)
-    echo "Você escolheu configurar DNS no openSUSE."
-    
-    # Senha (somente para fins didáticos!)
-    SENHA="123"
+    2)
+        echo "Você escolheu configurar DNS no openSUSE."
+        
+        # Senha (somente para fins didáticos!)
+        SENHA="123"
 
-    echo "Detectando interface de rede..."
-    INTERFACE=$(ip -o -4 route show to default | awk '{print $5}')
-    echo "Interface detectada: $INTERFACE"
+        echo "Detectando interface de rede..."
+        INTERFACE=$(ip -o -4 route show to default | awk '{print $5}')
+        echo "Interface detectada: $INTERFACE"
 
-    echo "Atualizando pacotes..."
-    echo $SENHA | sudo -S zypper refresh
-    echo $SENHA | sudo -S zypper update --no-confirm
+        echo "Atualizando pacotes..."
+        echo $SENHA | sudo -S zypper refresh
+        echo $SENHA | sudo -S zypper update --no-confirm
 
-    echo "Instalando BIND..."
-    echo $SENHA | sudo -S zypper install --no-confirm bind
+        echo "Instalando BIND..."
+        echo $SENHA | sudo -S zypper install --no-confirm bind
 
-    echo "Configurando IP fixo 192.168.0.1/24 na interface $INTERFACE..."
-    echo $SENHA | sudo -S ip addr flush dev $INTERFACE
-    echo $SENHA | sudo -S ip addr add 192.168.0.1/24 dev $INTERFACE
-    echo $SENHA | sudo -S ip link set $INTERFACE up
+        echo "Configurando IP fixo 192.168.0.1/24 na interface $INTERFACE..."
+        echo $SENHA | sudo -S ip addr flush dev $INTERFACE
+        echo $SENHA | sudo -S ip addr add 192.168.0.1/24 dev $INTERFACE
+        echo $SENHA | sudo -S ip link set $INTERFACE up
 
-    echo "Criando backup do arquivo named.conf..."
-    echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
+        echo "Criando backup do arquivo named.conf..."
+        echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
 
-    echo "Criando arquivo zonas.txt em $HOME/Documentos..."
-    tee $HOME/Documentos/zonas.txt > /dev/null <<EOF
+        echo "Criando arquivo zonas.txt em $HOME/Documentos..."
+        tee $HOME/Documentos/zonas.txt > /dev/null <<EOF
 include "/etc/named.conf.include";
 
 zone "grau.local" IN {
@@ -133,11 +133,10 @@ zone "192.in-addr.arpa" IN {
 };
 EOF
 
-    echo "Obs: O arquivo /etc/named.conf original permanece inalterado e o conteúdo das zonas foi salvo em $HOME/Documentos/zonas.txt"
+        echo "Obs: O arquivo /etc/named.conf original permanece inalterado e o conteúdo das zonas foi salvo em $HOME/Documentos/zonas.txt"
 
-    # Continua criando os arquivos de zona normalmente
-    echo "Criando arquivo grau.local.conf..."
-    echo $SENHA | sudo -S tee /var/lib/named/grau.local.conf > /dev/null <<EOF
+        echo "Criando arquivo grau.local.conf..."
+        echo $SENHA | sudo -S tee /var/lib/named/grau.local.conf > /dev/null <<EOF
 \$TTL 604800
 @       IN      SOA     grau.local. root.grau.local. (
                               2         ; Serial
@@ -152,8 +151,8 @@ www     IN      A       192.168.0.1
 ftp     IN      A       192.168.0.1
 EOF
 
-    echo "Criando arquivo db.192..."
-    echo $SENHA | sudo -S tee /var/lib/named/db.192 > /dev/null <<EOF
+        echo "Criando arquivo db.192..."
+        echo $SENHA | sudo -S tee /var/lib/named/db.192 > /dev/null <<EOF
 \$TTL 604800
 @       IN      SOA     grau.local. root.grau.local. (
                               2         ; Serial
@@ -168,15 +167,20 @@ EOF
 1       IN      PTR     ftp.grau.local.
 EOF
 
-    echo "Habilitando e reiniciando o serviço named..."
-    echo $SENHA | sudo -S systemctl enable named
-    echo $SENHA | sudo -S systemctl restart named
+        echo "Habilitando e reiniciando o serviço named..."
+        echo $SENHA | sudo -S systemctl enable named
+        echo $SENHA | sudo -S systemctl restart named
 
-    echo "Substituindo o arquivo resolv.conf..."
-    echo $SENHA | sudo -S mv /etc/resolv.conf /etc/resolv.conf.bkp
-    echo $SENHA | sudo -S tee /etc/resolv.conf > /dev/null <<EOF
+        echo "Substituindo o arquivo resolv.conf..."
+        echo $SENHA | sudo -S mv /etc/resolv.conf /etc/resolv.conf.bkp
+        echo $SENHA | sudo -S tee /etc/resolv.conf > /dev/null <<EOF
 nameserver 192.168.0.1
 EOF
 
-    echo "Configuração concluída com sucesso!"
-    ;;
+        echo "Configuração concluída com sucesso!"
+        ;;
+    *)
+        echo "Opção inválida. Saindo..."
+        exit 1
+        ;;
+esac
