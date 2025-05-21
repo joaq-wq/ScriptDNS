@@ -9,6 +9,7 @@ echo "Escolha o sistema operacional:"
 echo "1 - Ubuntu"
 echo "2 - openSUSE"
 echo "3 - CentOS"
+echo "4 - Arch Linux"
 echo ""
 
 read -p "Digite sua opção (1, 2 ou 3): " opcao
@@ -280,7 +281,95 @@ www.grau.local 192.168.0.1
 ftp.grau.local 192.168.0.1
 EOF
 
-        echo "Configuração concluída com sucesso!"
+      4)
+        echo "Você escolheu configurar DNS no Arch Linux."
+
+        SENHA="123"
+
+        echo "Detectando interface de rede..."
+        INTERFACE=$(ip -o -4 route show to default | awk '{print $5}')
+        echo "Interface detectada: $INTERFACE"
+
+        echo "Atualizando pacotes..."
+        echo $SENHA | sudo -S pacman -Syu --noconfirm
+
+        echo "Instalando BIND..."
+        echo $SENHA | sudo -S pacman -S --noconfirm bind
+
+        echo "Configurando IP fixo 192.168.0.1/24 na interface $INTERFACE..."
+        echo $SENHA | sudo -S ip addr flush dev $INTERFACE
+        echo $SENHA | sudo -S ip addr add 192.168.0.1/24 dev $INTERFACE
+        echo $SENHA | sudo -S ip link set $INTERFACE up
+
+        echo "Criando backup do named.conf..."
+        echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
+
+        echo "Configurando named.conf com options e zonas..."
+        echo $SENHA | sudo -S tee /etc/named.conf > /dev/null <<EOF
+options {
+    directory "/var/named";
+    allow-query { any; };
+    recursion yes;
+    listen-on port 53 { any; };
+    allow-transfer { none; };
+};
+
+zone "grau.local" IN {
+    type master;
+    file "grau.local.conf";
+};
+
+zone "192.in-addr.arpa" IN {
+    type master;
+    file "db.192";
+};
+EOF
+
+        echo "Criando arquivo grau.local.conf..."
+        echo $SENHA | sudo -S tee /var/named/grau.local.conf > /dev/null <<EOF
+\$TTL 604800
+@       IN      SOA     grau.local. root.grau.local. (
+                              2         ; Serial
+                              604800    ; Refresh
+                              86400     ; Retry
+                              2419200   ; Expire
+                              604800 )  ; Negative Cache TTL
+
+@       IN      NS      grau.local.
+@       IN      A       192.168.0.1
+www     IN      A       192.168.0.1
+ftp     IN      A       192.168.0.1
+EOF
+
+        echo "Criando arquivo db.192..."
+        echo $SENHA | sudo -S tee /var/named/db.192 > /dev/null <<EOF
+\$TTL 604800
+@       IN      SOA     grau.local. root.grau.local. (
+                              2         ; Serial
+                              604800    ; Refresh
+                              86400     ; Retry
+                              2419200   ; Expire
+                              604800 )  ; Negative Cache TTL
+
+@       IN      NS      grau.local.
+1       IN      PTR     grau.local.
+1       IN      PTR     www.grau.local.
+1       IN      PTR     ftp.grau.local.
+EOF
+
+        echo "Habilitando e reiniciando o serviço named..."
+        echo $SENHA | sudo -S systemctl enable named
+        echo $SENHA | sudo -S systemctl restart named
+
+        echo "Substituindo o arquivo resolv.conf..."
+        echo $SENHA | sudo -S mv /etc/resolv.conf /etc/resolv.conf.bkp
+        echo $SENHA | sudo -S tee /etc/resolv.conf > /dev/null <<EOF
+nameserver 192.168.0.1
+www.grau.local 192.168.0.1
+ftp.grau.local 192.168.0.1
+EOF
+
+        echo "Configuração concluída com sucesso no Arch Linux!"
         ;;
         
     *)
