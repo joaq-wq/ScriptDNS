@@ -77,10 +77,8 @@ EOF
                               2419200   ; Expire
                               604800 )  ; Negative Cache TTL
 
-@       IN      NS      grau.local.
-1       IN      PTR     grau.local.
-1       IN      PTR     www.grau.local.
-1       IN      PTR     ftp.grau.local.
+@             IN      NS      grau.local.
+1.0.168       IN      PTR     grau.local.
 EOF
 
         echo "Reiniciando o serviço BIND9..."
@@ -121,7 +119,7 @@ EOF
         echo "Criando backup do named.conf..."
         echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
 
-        echo "Configurando named.conf com options e zonas..."
+        echo "Configurando named.conf..."
         echo $SENHA | sudo -S tee /etc/named.conf > /dev/null <<EOF
 options {
     directory "/var/lib/named";
@@ -171,10 +169,8 @@ EOF
                               2419200   ; Expire
                               604800 )  ; Negative Cache TTL
 
-@       IN      NS      grau.local.
-1       IN      PTR     grau.local.
-1       IN      PTR     www.grau.local.
-1       IN      PTR     ftp.grau.local.
+@             IN      NS      grau.local.
+1.0.168       IN      PTR     grau.local.
 EOF
 
         echo "Habilitando e reiniciando o serviço named..."
@@ -215,7 +211,7 @@ EOF
         echo "Criando backup do named.conf..."
         echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
 
-        echo "Configurando named.conf com options e zonas..."
+        echo "Configurando named.conf..."
         echo $SENHA | sudo -S tee /etc/named.conf > /dev/null <<EOF
 options {
     directory "/var/named";
@@ -263,10 +259,8 @@ EOF
                               2419200   ; Expire
                               604800 )  ; Negative Cache TTL
 
-@       IN      NS      grau.local.
-1       IN      PTR     grau.local.
-1       IN      PTR     www.grau.local.
-1       IN      PTR     ftp.grau.local.
+@             IN      NS      grau.local.
+1.0.168       IN      PTR     grau.local.
 EOF
 
         echo "Habilitando e reiniciando o serviço named..."
@@ -281,7 +275,7 @@ www.grau.local 192.168.0.1
 ftp.grau.local 192.168.0.1
 EOF
 
-        echo "Configuração concluída com sucesso!"
+        echo "Configuração concluída com sucesso no CentOS!"
         ;;
 
     4)
@@ -307,7 +301,7 @@ EOF
         echo "Criando backup do named.conf..."
         echo $SENHA | sudo -S cp /etc/named.conf /etc/named.conf.bkp
 
-        echo "Configurando named.conf com options e zonas..."
+        echo "Configurando named.conf..."
         echo $SENHA | sudo -S tee /etc/named.conf > /dev/null <<EOF
 options {
     directory "/var/named";
@@ -354,10 +348,8 @@ EOF
                               2419200   ; Expire
                               604800 )  ; Negative Cache TTL
 
-@       IN      NS      grau.local.
-1       IN      PTR     grau.local.
-1       IN      PTR     www.grau.local.
-1       IN      PTR     ftp.grau.local.
+@             IN      NS      grau.local.
+1.0.168       IN      PTR     grau.local.
 EOF
 
         echo "Habilitando e reiniciando o serviço named..."
@@ -374,7 +366,7 @@ EOF
 
         echo "Configuração concluída com sucesso no Arch Linux!"
         ;;
-
+        
     *)
         echo "Opção inválida. Saindo..."
         exit 1
